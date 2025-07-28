@@ -4,10 +4,11 @@ import router from '@adonisjs/core/services/router'
 import auth from '#middleware/auth_middleware'
 
 
+router.get('/', async () => {
+  return 'Welcome'
+})
 router.post('/register', [AuthController, 'register']),
 router.post('/login', [AuthController, 'login']),
 router.post('/tasks', [TasksController, 'store']).use(auth),
 router.get('/tasks', [TasksController, 'index'])
-router.get('/', async () => {
-  return 'Welcome'
-})
+router.put('/tasks/:id', [TasksController, 'update'])

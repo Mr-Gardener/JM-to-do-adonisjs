@@ -1,4 +1,3 @@
-// app/validators/task.ts
 import { v } from 'vine'
 
 export const createTaskValidator = v.object({
