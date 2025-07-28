@@ -3,14 +3,19 @@ import { createTaskValidator } from '#validators/task'
 import Task from '#models/task'
 
 export default class TasksController {
-  async store({ request, auth, response }: HttpContext ) {
+  async store({ request, auth, response }: HttpContext) {
+    const user = auth.user!
+
     const payload = await request.validateUsing(createTaskValidator)
 
     const task = await Task.create({
       ...payload,
-      userId: auth.user!.id,
+      userId: user.id,
     })
 
-    return response.created({ message: 'Task created successfully', task })
+    return response.created({
+      message: 'Task created successfully',
+      data: task,
+    })
   }
 }

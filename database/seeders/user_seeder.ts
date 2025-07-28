@@ -1,9 +1,11 @@
 import User from '#models/user'
-import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import Hash from '@adonisjs/core/services/hash'
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class UserSeeder extends BaseSeeder {
-  async run() {
+  public async run() {
+    await User.query().delete() 
+
     await User.createMany([
       {
         fullName: 'John Doe',
@@ -18,3 +20,4 @@ export default class UserSeeder extends BaseSeeder {
     ])
   }
 }
+

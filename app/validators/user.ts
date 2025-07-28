@@ -1,4 +1,3 @@
-// ✅ Fix in: validators/user.ts
 import vine from '@vinejs/vine'
 
 export const createUserValidator = vine.compile(
