@@ -12,3 +12,4 @@ router.post('/login', [AuthController, 'login']),
 router.post('/tasks', [TasksController, 'store']).use(auth),
 router.get('/tasks', [TasksController, 'index'])
 router.put('/tasks/:id', [TasksController, 'update'])
+router.delete('/tasks/:id', [TasksController, 'destroy'])

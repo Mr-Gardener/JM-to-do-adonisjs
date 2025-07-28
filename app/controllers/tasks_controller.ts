@@ -50,4 +50,19 @@ export default class TasksController {
       data: task,
     })
   }
+
+    async destroy({ params, response }: HttpContext) {
+    const taskId = params.id
+
+    const task = await Task.find(taskId)
+
+    if (!task) {
+      return response.notFound({ message: 'Task not found' })
+    }
+
+    await task.delete()
+
+    return response.ok({ message: 'Task deleted successfully' })
+  }
+  
 }
