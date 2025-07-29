@@ -1,5 +1,5 @@
-import { v } from 'vine'
+import vine from '@vinejs/vine'
 
-export const deleteTasksValidator = v.object({
-  ids: v.array(v.number()).minLength(1),
+export const deleteTasksValidator = vine.object({
+  ids: vine.array(vine.number()).minLength(1),
 })
