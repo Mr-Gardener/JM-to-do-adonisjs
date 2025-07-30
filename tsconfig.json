@@ -9,7 +9,11 @@
       "#validators/*": ["app/validators/*"],
       "#models/*": ["app/models/*"],
       "#controllers/*": ["app/controllers/*"],
-      "@ioc:Adonis/*": ["./node_modules/@adonisjs/*/build"]
+      "@ioc:Adonis/*": ["./node_modules/@adonisjs/*/build"],
+      "App/*": ["app/*"],
+      "Contracts/*": ["contracts/*"],
+      "Config/*": ["config/*"],
+      "Database/*": ["database/*"]
     }
   }
 }

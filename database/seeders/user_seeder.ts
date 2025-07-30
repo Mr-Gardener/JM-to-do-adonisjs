@@ -1,23 +1,23 @@
-import User from '#models/user'
-import Hash from '@adonisjs/core/services/hash'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
+import User from '#models/user'
+import hash from '@adonisjs/core/services/hash'
 
 export default class UserSeeder extends BaseSeeder {
-  public async run() {
-    await User.query().delete() 
+  async run() {
+
+    await User.query().delete()
 
     await User.createMany([
       {
-        fullName: 'John Doe',
-        email: 'john@example.com',
-        password: await Hash.make('password'),
+        email: 'virk@adonisjs.com',
+        password: await hash.make('secret'),
+        fullName: 'Virk Adonis',
       },
       {
-        fullName: 'Jane Smith',
-        email: 'jane@example.com',
-        password: await Hash.make('password'),
+        email: 'romain@adonisjs.com',
+        password: await hash.make('supersecret'),
+        fullName: 'Romain L.',
       },
     ])
   }
 }
-
