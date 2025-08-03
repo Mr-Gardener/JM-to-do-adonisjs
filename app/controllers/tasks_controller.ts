@@ -67,19 +67,19 @@ export default class TasksController {
   }
 
     async deleteMany({ request, response }: HttpContext) {
-    const { ids } = await request.validateUsing(deleteTasksValidator)
+      const { ids } = await request.validateUsing(deleteTasksValidator)
 
-    const tasks = await Task.query().whereIn('id', ids)
+      const tasks = await Task.query().whereIn('id', ids)
 
-    if (tasks.length === 0) {
-      return response.notFound({ message: 'No matching tasks found' })
+      if (tasks.length === 0) {
+        return response.notFound({ message: 'No matching tasks found' })
+      }
+
+      await Task.query().whereIn('id', ids).delete()
+
+      return response.ok({
+        message: `${tasks.length} task(s) deleted successfully`,
+      })
     }
-
-    await Task.query().whereIn('id', ids).delete()
-
-    return response.ok({
-      message: `${tasks.length} task(s) deleted successfully`,
-    })
-  }
 
 }

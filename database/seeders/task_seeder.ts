@@ -4,10 +4,10 @@ import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class TaskSeeder extends BaseSeeder {
   async run() {
-    const john = await User.findBy('email', 'john@example.com')
-    const jane = await User.findBy('email', 'jane@example.com')
+    const virk = await User.findBy('email', 'virk@adonisjs.com')
+    const romain = await User.findBy('email', 'romain@adonisjs.com')
 
-    if (!john || !jane) {
+    if (!virk || !romain) {
       console.error('Seed users not found.')
       return
     }
@@ -16,17 +16,17 @@ export default class TaskSeeder extends BaseSeeder {
       {
         title: 'Finish project docs',
         description: 'Complete the documentation by Friday',
-        userId: john.id,
+        userId: virk.id,
       },
       {
         title: 'Fix login bug',
         description: 'Resolve session issues on frontend',
-        userId: john.id,
+        userId: virk.id,
       },
       {
         title: 'Design dashboard',
         description: 'Create new layout for admin dashboard',
-        userId: jane.id,
+        userId: romain.id,
       },
     ])
   }
