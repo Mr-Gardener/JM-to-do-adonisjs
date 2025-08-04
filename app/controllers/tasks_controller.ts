@@ -1,8 +1,8 @@
 import { HttpContext } from '@adonisjs/core/http'
 import { createTaskValidator } from '#validators/task'
 import Task from '#models/task'
-import { updateTaskValidator } from '#validators/updateTaskValidator'
-import { deleteTasksValidator } from '#validators/delete_tasks_validator'
+import { updateTaskValidator } from '#validators/task'
+import { deleteTasksValidator } from '#validators/task'
 
 export default class TasksController {
   async store(ctx: HttpContext) {
@@ -52,7 +52,7 @@ export default class TasksController {
     })
   }
 
-    async destroy({ params, response }: HttpContext) {
+  async destroy({ params, response }: HttpContext) {
     const taskId = params.id
 
     const task = await Task.find(taskId)
@@ -66,20 +66,19 @@ export default class TasksController {
     return response.ok({ message: 'Task deleted successfully' })
   }
 
-    async deleteMany({ request, response }: HttpContext) {
-      const { ids } = await request.validateUsing(deleteTasksValidator)
+  async deleteMany({ request, response }: HttpContext) {
+    const { ids } = await request.validateUsing(deleteTasksValidator)
 
-      const tasks = await Task.query().whereIn('id', ids)
+    const tasks = await Task.query().whereIn('id', ids)
 
-      if (tasks.length === 0) {
-        return response.notFound({ message: 'No matching tasks found' })
-      }
-
-      await Task.query().whereIn('id', ids).delete()
-
-      return response.ok({
-        message: `${tasks.length} task(s) deleted successfully`,
-      })
+    if (tasks.length === 0) {
+      return response.notFound({ message: 'No matching tasks found' })
     }
 
+    await Task.query().whereIn('id', ids).delete()
+
+    return response.ok({
+      message: `${tasks.length} task(s) deleted successfully`,
+    })
+  }
 }

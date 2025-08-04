@@ -1,9 +1,10 @@
 import User from '#models/user'
-import { forgotPasswordValidator } from '#validators/forgot_password_validator'
-import { resetPasswordValidator } from '#validators/reset_password_validator'
+import { forgotPasswordValidator } from '#validators/password'
+import { resetPasswordValidator } from '#validators/password'
 import { HttpContext } from '@adonisjs/core/http'
 import crypto from 'node:crypto'
 import { DateTime } from 'luxon'
+import mail from '@adonisjs/mail/services/main'
 
 export default class UsersController {
   async forgotPassword({ request, response }: HttpContext) {
@@ -14,14 +15,20 @@ export default class UsersController {
       return response.notFound({ message: 'User not found' })
     }
 
-    // generate a secure random token
+    // generate a secure token
     const token = crypto.randomBytes(32).toString('hex')
     user.resetToken = token
     user.resetTokenExpiresAt = DateTime.utc().plus({ hours: 1 })
     await user.save()
 
-    // 👉 TODO: Send token via email
-    console.log(`Password reset token: ${token}`)
+    // send the token via email
+    await mail.send((message) => {
+      message
+        .from('"JMTodo" <info@demomailtrap.co>')
+        .to(user.email)
+        .subject('Reset Your Password')
+        .htmlView('emails/forgot_password', { user, token })
+    })
 
     return response.ok({ message: 'Password reset token sent to email' })
   }
