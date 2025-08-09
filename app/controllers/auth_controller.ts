@@ -34,12 +34,18 @@ export default class AuthController {
     const { email, password } = request.only(['email', 'password'])
 
     try {
+      // ✅ Verify credentials
       const user = await User.verifyCredentials(email, password)
 
+      // ✅ Create token
       const token = await User.accessTokens.create(user)
 
+      // extract raw token string from the Secret wrapper
+      const rawToken = token.value!.release()
+
       return response.ok({
-        token: token.value,
+        access_token: rawToken,
+        token_type: 'bearer',
         user: {
           id: user.id,
           email: user.email,
