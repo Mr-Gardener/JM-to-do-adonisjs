@@ -1,27 +1,23 @@
 import router from '@adonisjs/core/services/router'
-import AuthController from '#controllers/auth_controller'
-import TasksController from '#controllers/tasks_controller'
-import UsersController from '#controllers/users_controller'
 import { middleware } from './kernel.js'
 
 router
   .group(() => {
-    //  Public API routes
-    router.post('/register', async (ctx) => {
-      return new AuthController().register(ctx)
-    })
-    router.post('/login', [AuthController, 'login'])
-    router.post('/forgot-password', [UsersController, 'forgotPassword'])
-    router.post('/reset-password', [UsersController, 'resetPassword'])
+    router.post('/login', [() => import('#controllers/auth_controller'), 'login'])
+    router.post('/register', [() => import('#controllers/auth_controller'), 'register'])
+    router.post('/forgot-password', [
+      () => import('#controllers/users_controller'),
+      'forgotPassword',
+    ])
+    router.post('/reset-password', [() => import('#controllers/users_controller'), 'resetPassword'])
 
-    // Protected /tasks routes (nested group with auth middleware)
     router
       .group(() => {
-        router.post('/', [TasksController, 'store'])
-        router.get('/', [TasksController, 'index'])
-        router.put('/:id', [TasksController, 'update'])
-        router.delete('/:id', [TasksController, 'destroy'])
-        router.delete('/', [TasksController, 'deleteMany'])
+        router.post('/', [() => import('#controllers/tasks_controller'), 'store'])
+        router.get('/', [() => import('#controllers/tasks_controller'), 'index'])
+        router.put('/:id', [() => import('#controllers/tasks_controller'), 'update'])
+        router.delete('/:id', [() => import('#controllers/tasks_controller'), 'destroy'])
+        router.delete('/', [() => import('#controllers/tasks_controller'), 'deleteMany'])
       })
       .prefix('/tasks')
       .middleware([middleware.auth()])

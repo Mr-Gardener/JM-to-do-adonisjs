@@ -21,15 +21,10 @@ export default class TasksController {
     })
   }
 
-  async index(ctx: HttpContext) {
-    const { auth, response } = ctx
-
+  async index({ auth, response }: HttpContext) {
     const tasks = await Task.query().where('userId', auth.user!.id).orderBy('createdAt', 'desc')
 
-    return response.ok({
-      message: 'Tasks fetched successfully',
-      data: tasks,
-    })
+    return response.ok(tasks)
   }
 
   async update(ctx: HttpContext) {
