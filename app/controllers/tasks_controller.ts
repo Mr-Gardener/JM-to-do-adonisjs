@@ -47,7 +47,7 @@ export default class TasksController {
     })
   }
 
-  async destroy({ params, response }: HttpContext) {
+  async destroy({ params, auth, response }: HttpContext) {
     const taskId = params.id
 
     const task = await Task.find(taskId)
@@ -56,21 +56,28 @@ export default class TasksController {
       return response.notFound({ message: 'Task not found' })
     }
 
+    // Ensure task belongs to logged-in user
+    if (task.userId !== auth.user!.id) {
+      return response.forbidden({ message: 'You are not allowed to delete this task' })
+    }
+
     await task.delete()
 
     return response.ok({ message: 'Task deleted successfully' })
   }
 
-  async deleteMany({ request, response }: HttpContext) {
+  async deleteMany({ request, auth, response }: HttpContext) {
     const { ids } = await request.validateUsing(deleteTasksValidator)
 
-    const tasks = await Task.query().whereIn('id', ids)
+    //Finds tasks that match AND belong to the user
+    const tasks = await Task.query().whereIn('id', ids).andWhere('user_id', auth.user!.id)
 
     if (tasks.length === 0) {
       return response.notFound({ message: 'No matching tasks found' })
     }
 
-    await Task.query().whereIn('id', ids).delete()
+    //Delete only the tasks that belong to the user
+    await Task.query().whereIn('id', ids).andWhere('user_id', auth.user!.id).delete()
 
     return response.ok({
       message: `${tasks.length} task(s) deleted successfully`,
