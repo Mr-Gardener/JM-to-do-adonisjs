@@ -10,6 +10,7 @@ router
       'forgotPassword',
     ])
     router.post('/reset-password', [() => import('#controllers/users_controller'), 'resetPassword'])
+    router.get('/verify-email', [() => import('#controllers/auth_controller'), 'verifyEmail'])
 
     router
       .group(() => {

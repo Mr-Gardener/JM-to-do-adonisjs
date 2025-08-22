@@ -4,6 +4,7 @@ export const createTaskValidator = vine.compile(
   vine.object({
     title: vine.string().minLength(3),
     description: vine.string().optional(),
+    isCompleted: vine.boolean().optional(),
   })
 )
 

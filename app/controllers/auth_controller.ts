@@ -1,6 +1,8 @@
 import { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import { createUserValidator } from '#validators/create_user_validator'
+import { randomUUID } from 'node:crypto'
+import mail from '@adonisjs/mail/services/main'
 
 export default class AuthController {
   async register({ request, response }: HttpContext) {
@@ -15,19 +17,48 @@ export default class AuthController {
     }
 
     // If not, create new user
+    const verificationToken = randomUUID()
     const user = await User.create({
       fullName: payload.full_name,
       email: payload.email,
       password: payload.password,
+      verificationToken,
+      isVerified: false,
     })
 
-    const token = await User.accessTokens.create(user)
+    // const token = await User.accessTokens.create(user)
+
+    // Send verification email
+    await mail.send((message) => {
+      message
+        .to(user.email)
+        .subject('Verify your account')
+        .htmlView('emails/verify', {
+          token: verificationToken,
+          user: user,
+          url: `http://localhost:3333/verify/${verificationToken}`,
+        })
+    })
 
     return response.status(201).json({
-      token,
-      message: 'User registered successfully',
-      user,
+      message: 'Registration successful. Please check your email to verify your account.',
     })
+  }
+
+  async verifyEmail({ request, response }: HttpContext) {
+    const token = request.input('token')
+
+    const user = await User.findBy('verification_token', token)
+
+    if (!user) {
+      return response.badRequest({ message: 'Invalid verification token' })
+    }
+
+    user.isVerified = true
+    user.verificationToken = null
+    await user.save()
+
+    return response.ok({ message: 'Email verified successfully. You can now log in.' })
   }
 
   async login({ request, response }: HttpContext) {
