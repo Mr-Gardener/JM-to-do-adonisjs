@@ -87,4 +87,9 @@ export default class AuthController {
       return response.unauthorized({ message: 'Invalid credentials' })
     }
   }
+
+  async logout({ auth, response }: HttpContext) {
+    await auth.use('api').invalidateToken()
+    return response.ok({ message: 'Logged out successfully' })
+  }
 }
