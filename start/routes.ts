@@ -11,6 +11,13 @@ router
     ])
     router.post('/reset-password', [() => import('#controllers/users_controller'), 'resetPassword'])
     router.get('/verify-email', [() => import('#controllers/auth_controller'), 'verifyEmail'])
+    router.post('/resend-verification', [
+      () => import('#controllers/auth_controller'),
+      'resendVerification',
+    ])
+    router
+      .get('/me', [() => import('#controllers/auth_controller'), 'me'])
+      .middleware([middleware.auth()])
     router
       .delete('/logout', [() => import('#controllers/auth_controller'), 'logout'])
       .use(middleware.auth({ guards: ['api'] }))

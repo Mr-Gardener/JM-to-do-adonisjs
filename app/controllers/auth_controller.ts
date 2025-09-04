@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import mail from '@adonisjs/mail/services/main'
 
 export default class AuthController {
+  // register user
   async register({ request, response }: HttpContext) {
     const payload = await request.validateUsing(createUserValidator)
 
@@ -45,10 +46,11 @@ export default class AuthController {
     })
   }
 
+  // verification mail
   async verifyEmail({ request, response }: HttpContext) {
     const token = request.input('token')
 
-    const user = await User.findBy('verification_token', token)
+    const user = await User.findBy('verificationToken', token)
 
     if (!user) {
       return response.badRequest({ message: 'Invalid verification token' })
@@ -58,20 +60,54 @@ export default class AuthController {
     user.verificationToken = null
     await user.save()
 
-    return response.ok({ message: 'Email verified successfully. You can now log in.' })
+    // ✅ Instead of just JSON, redirect to FE login page
+    return response.redirect('http://localhost:3000/auth/login')
   }
 
+  // resend verification mail
+  async resendVerification({ request, response }: HttpContext) {
+    const email = request.input('email')
+    const user = await User.findBy('email', email)
+
+    if (!user) {
+      return response.notFound({ message: 'User not found' })
+    }
+
+    if (user.isVerified) {
+      return response.badRequest({ message: 'User already verified' })
+    }
+
+    // Generate new token
+    user.verificationToken = crypto.randomUUID()
+    await user.save()
+
+    await mail.send((message) => {
+      message
+        .to(user.email)
+        .subject('Verify your email')
+        .htmlView('emails/verify', { token: user.verificationToken })
+    })
+
+    return response.ok({ message: 'Verification email resent successfully' })
+  }
+
+  //login
   async login({ request, response }: HttpContext) {
     const { email, password } = request.only(['email', 'password'])
 
     try {
-      // ✅ Verify credentials
+      // Verify credentials
       const user = await User.verifyCredentials(email, password)
 
-      // ✅ Create token
-      const token = await User.accessTokens.create(user)
+      // 🚫 Block if not verified
+      if (!user.isVerified) {
+        return response.unauthorized({
+          message: 'Please verify your email before logging in.',
+        })
+      }
 
-      // extract raw token string from the Secret wrapper
+      // Create token
+      const token = await User.accessTokens.create(user)
       const rawToken = token.value!.release()
 
       return response.ok({
@@ -85,6 +121,25 @@ export default class AuthController {
     } catch (error) {
       console.log('Login error:', error.message)
       return response.unauthorized({ message: 'Invalid credentials' })
+    }
+  }
+
+  async me({ auth, response }: HttpContext) {
+    try {
+      const user = auth.user
+      if (!user) {
+        return response.unauthorized({ message: 'Not authenticated' })
+      }
+
+      return response.ok({
+        user: {
+          id: user.id,
+          email: user.email,
+          isVerified: user.isVerified,
+        },
+      })
+    } catch (error) {
+      return response.internalServerError({ message: 'Failed to fetch user info' })
     }
   }
 
