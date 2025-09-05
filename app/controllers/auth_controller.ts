@@ -27,8 +27,6 @@ export default class AuthController {
       isVerified: false,
     })
 
-    // const token = await User.accessTokens.create(user)
-
     // Send verification email
     await mail.send((message) => {
       message
@@ -37,7 +35,7 @@ export default class AuthController {
         .htmlView('emails/verify', {
           token: verificationToken,
           user: user,
-          url: `http://localhost:3333/verify/${verificationToken}`,
+          url: `http://localhost:3000/auth/verify-email?token=${verificationToken}`,
         })
     })
 
@@ -50,18 +48,21 @@ export default class AuthController {
   async verifyEmail({ request, response }: HttpContext) {
     const token = request.input('token')
 
+    if (!token) {
+      return response.badRequest({ message: 'No token provided' })
+    }
+
     const user = await User.findBy('verificationToken', token)
 
     if (!user) {
-      return response.badRequest({ message: 'Invalid verification token' })
+      return response.badRequest({ message: 'Invalid or expired verification token' })
     }
 
     user.isVerified = true
     user.verificationToken = null
     await user.save()
 
-    // ✅ Instead of just JSON, redirect to FE login page
-    return response.redirect('http://localhost:3000/auth/login')
+    return response.ok({ message: 'Email verified successfully' })
   }
 
   // resend verification mail
