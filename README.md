@@ -74,3 +74,7 @@ build/ → Compiled production code
 config/ → App configuration
 database/ → Migrations and seeds
 start/ → Kernel and boot files
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
