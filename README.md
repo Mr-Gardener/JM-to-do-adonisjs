@@ -41,13 +41,7 @@ node ace migration:run
 ### Build for Production
 
 ```bash
-npm run build
-```
-
-### Start in Production
-
-```bash
-node build/bin/server.js
+node ace build
 ```
 
 ## Deployment Notes
@@ -55,16 +49,16 @@ node build/bin/server.js
 ### build command on deployment platforms (e.g. Render):
 
 ```bash
-npm ci && node ace build;
+npm ci && node ace build; # or npm install; npm run build
 ```
 
 ### Start command on deployment platforms (e.g. Render):
 
 ```bash
-node build/bin/server.js
+cd build && npm ci --omit=dev && node bin/server.js
 ```
 
-Note: Do not override/fill the PORT and NODE_ENV field in .env when deploying — Render provides them automatically.
+Note: Do not override/fill the 'PORT' field in .env when deploying — Render provides them automatically.
 
 ## Project Structure
 
