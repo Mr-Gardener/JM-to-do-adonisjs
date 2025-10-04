@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: jm-todo-backend
+    env: node
+    rootDir: build
+    buildCommand: |
+      node ../ace build --production
+      cd build && npm ci --omit=dev
+    startCommand: node bin/server.js
+    envVars:
+      - key: PORT
+        value: 3333
